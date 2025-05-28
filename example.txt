@@ -1,0 +1,3 @@
+1hello world this is good i am mother
+2and this is bad
+3and this is neutral

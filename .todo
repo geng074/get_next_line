@@ -1,0 +1,5 @@
+problem  with output strjoin
+buffer[buffer_size + 1]
+i should use byte read as indicator of buffer
+
+flag issue... at ft_adv_buffer
