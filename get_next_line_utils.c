@@ -6,7 +6,7 @@
 /*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 14:45:54 by giho              #+#    #+#             */
-/*   Updated: 2025/05/28 17:39:50 by giho             ###   ########.fr       */
+/*   Updated: 2025/05/28 20:16:10 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ void ft_adv(char *buffer, int adv)
 {
 	int i;
 	i = 0;
-	while (i < BUFFER_SIZE - 1 + adv)
+	while (i < BUFFER_SIZE - 1 + adv && buffer[i + adv + 1] != '\0') 
 	{
 		buffer[i] = buffer[i + adv + 1];
 		i++;

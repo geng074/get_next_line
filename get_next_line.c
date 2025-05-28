@@ -6,7 +6,7 @@
 /*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 14:45:36 by giho              #+#    #+#             */
-/*   Updated: 2025/05/28 18:26:54 by giho             ###   ########.fr       */
+/*   Updated: 2025/05/28 20:10:12 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ char *get_next_line(int fd)
 			printf("flag1 : %zd\n", flag);
 			fflush(stdout);
 			ft_adv(buffer, delimit - buffer );
+		
 			printf("flag2: %zd\n", flag);
 			fflush(stdout);
 			// printf("temp is %s\n",temp);
