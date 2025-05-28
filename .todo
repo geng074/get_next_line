@@ -3,3 +3,11 @@ buffer[buffer_size + 1]
 i should use byte read as indicator of buffer
 
 flag issue... at ft_adv_buffer
+
+You always return a null-terminated string.
+
+The final visible character before the \0 should be \n if the file line had a newline.
+
+Only the last line should be returned without \n if the file itself doesn't end with a newline.
+
+If nothing more can be read (EOF and buffer is empty), return NULL.
