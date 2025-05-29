@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: giho <giho@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 14:45:36 by giho              #+#    #+#             */
-/*   Updated: 2025/05/29 17:44:27 by giho             ###   ########.fr       */
+/*   Updated: 2025/05/29 17:38:05 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*gnl_strchr(const char *s, int c)
 {
@@ -61,15 +61,11 @@ static char	*get_next_line_helper(t_buffer_state *buffer_state,
 {
 	char	*delimit;
 	char	*temp;
-
+	
 	while (buffer_state->flag >= 0)
 	{
 		if (buffer_state->flag == 0 && buffer_state->buffer[0] == '\0')
-		{
-			free(buffer_state->buffer);
-			buffer_state->buffer = NULL;
 			return (output);
-		}
 		delimit = gnl_strchr(buffer_state->buffer, '\n');
 		if (delimit)
 		{
@@ -93,31 +89,42 @@ static char	*get_next_line_helper(t_buffer_state *buffer_state,
 char	*get_next_line(int fd)
 {
 	char					*output;
-	static t_buffer_state	buffer_state;
+	static t_buffer_state	buffer_state[FD_LIMIT];
 
-	if (fd == -1)
-	{
-		return (NULL);
-	}
+
+	if (fd < 0 || fd >= FD_LIMIT)
+    return NULL;
+
+	
+
+	
+	// if (fd == -1)
+	// {
+	// 	return (NULL);
+	// }
 	output = NULL;
-	if (!buffer_state.buffer)
+	
+	if (!buffer_state[fd].buffer)
 	{
-		buffer_state.buffer = malloc(BUFFER_SIZE + 1);
-		if (!buffer_state.buffer)
+		buffer_state[fd].buffer = malloc(BUFFER_SIZE + 1);
+		if (!buffer_state[fd].buffer)
 			return (NULL);
-		buffer_state.buffer[0] = '\0';
+		buffer_state[fd].buffer[0] = '\0'; 
 	}
-	if (buffer_state.buffer[0] == '\0')
-		buffer_state.flag = gnl_read_buffer(buffer_state.buffer, fd);
+	
+	
+	
+	if (buffer_state[fd].buffer[0] == '\0')
+		buffer_state[fd].flag = gnl_read_buffer(buffer_state[fd].buffer, fd);
 	else
-		buffer_state.flag = 1;
-	if (buffer_state.flag == -1)
+		buffer_state[fd].flag = 1;
+	if (buffer_state[fd].flag == -1)
 	{
-		free(buffer_state.buffer);
-		buffer_state.buffer = NULL;
+		free(buffer_state[fd].buffer);
+		buffer_state[fd].buffer = NULL;
 		free(output);
 		return (NULL);
 	}
-	output = get_next_line_helper(&buffer_state, output, fd);
+	output = get_next_line_helper(&buffer_state[fd], output, fd);
 	return (output);
 }

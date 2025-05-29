@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
+/*   By: giho <giho@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 14:58:14 by giho              #+#    #+#             */
-/*   Updated: 2025/05/28 20:16:45 by giho             ###   ########.fr       */
+/*   Updated: 2025/05/29 14:18:39 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,22 @@ int	main(void)
 	// printf("string is %s",output);
 	
 	fd = open("example.txt",O_RDONLY);
-	if (fd == -1)
-	{
-		perror("Error opening file");
-		return 1;
-	}	
+	// if (fd == -1)
+	// {
+	// 	perror("Error opening file");
+	// 	return 1;
+	// }	
 	
-	get_next_line(fd);
-	get_next_line(fd);
-	get_next_line(fd);
-	get_next_line(fd);
-	get_next_line(fd);
+	printf("%s",get_next_line(fd));
+	// printf("%s",get_next_line(fd));
+	// printf("%s",get_next_line(fd));
+	// printf("%s",get_next_line(fd));
+	// printf("%s",get_next_line(fd));
+	// printf("%s",get_next_line(fd));
+
+	// printf("%s",get_next_line(fd));
+	// printf("%s",get_next_line(fd));
+	
 	close(fd);
 	
 }
