@@ -6,7 +6,7 @@
 /*   By: giho <giho@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 14:45:36 by giho              #+#    #+#             */
-/*   Updated: 2025/05/29 17:38:05 by giho             ###   ########.fr       */
+/*   Updated: 2025/05/30 11:12:21 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,32 +56,31 @@ char	*gnl_strdup(const char *s)
 	return (ptr);
 }
 
-static char	*get_next_line_helper(t_buffer_state *buffer_state,
-			char *output, int fd)
+static char	*gnl_helper(t_buffer_state *buf_s, char *output, int fd)
 {
 	char	*delimit;
 	char	*temp;
-	
-	while (buffer_state->flag >= 0)
+
+	while (buf_s->flag >= 0)
 	{
-		if (buffer_state->flag == 0 && buffer_state->buffer[0] == '\0')
-			return (output);
-		delimit = gnl_strchr(buffer_state->buffer, '\n');
+		if (buf_s->flag == 0 && buf_s->buf[0] == '\0')
+		{
+			free(buf_s->buf);
+			return (buf_s->buf = NULL, output);
+		}
+		delimit = gnl_strchr(buf_s->buf, '\n');
 		if (delimit)
 		{
-			temp = gnl_substr(buffer_state->buffer, 0,
-					(size_t)(delimit - buffer_state->buffer));
-			gnl_adv(buffer_state->buffer, delimit - buffer_state->buffer);
+			temp = gnl_substr(buf_s->buf, 0, (size_t)(delimit - buf_s->buf));
+			gnl_adv(buf_s->buf, delimit - buf_s->buf);
 			output = gnl_strjoin(output, temp);
 			output = gnl_strjoin(output, "\n");
 			free(temp);
 			break ;
 		}
 		else
-		{
-			output = gnl_strjoin(output, buffer_state->buffer);
-		}
-		buffer_state->flag = gnl_read_buffer(buffer_state->buffer, fd);
+			output = gnl_strjoin(output, buf_s->buf);
+		buf_s->flag = gnl_read_buffer(buf_s->buf, fd);
 	}
 	return (output);
 }
@@ -89,42 +88,28 @@ static char	*get_next_line_helper(t_buffer_state *buffer_state,
 char	*get_next_line(int fd)
 {
 	char					*output;
-	static t_buffer_state	buffer_state[FD_LIMIT];
+	static t_buffer_state	buf_s[LIMIT];
 
-
-	if (fd < 0 || fd >= FD_LIMIT)
-    return NULL;
-
-	
-
-	
-	// if (fd == -1)
-	// {
-	// 	return (NULL);
-	// }
-	output = NULL;
-	
-	if (!buffer_state[fd].buffer)
-	{
-		buffer_state[fd].buffer = malloc(BUFFER_SIZE + 1);
-		if (!buffer_state[fd].buffer)
-			return (NULL);
-		buffer_state[fd].buffer[0] = '\0'; 
-	}
-	
-	
-	
-	if (buffer_state[fd].buffer[0] == '\0')
-		buffer_state[fd].flag = gnl_read_buffer(buffer_state[fd].buffer, fd);
-	else
-		buffer_state[fd].flag = 1;
-	if (buffer_state[fd].flag == -1)
-	{
-		free(buffer_state[fd].buffer);
-		buffer_state[fd].buffer = NULL;
-		free(output);
+	if (fd < 0 || fd >= LIMIT)
 		return (NULL);
+	output = NULL;
+	if (!buf_s[fd].buf)
+	{
+		buf_s[fd].buf = malloc(BUFFER_SIZE + 1);
+		if (!buf_s[fd].buf)
+			return (NULL);
+		buf_s[fd].buf[0] = '\0';
 	}
-	output = get_next_line_helper(&buffer_state[fd], output, fd);
+	if (buf_s[fd].buf[0] == '\0')
+		buf_s[fd].flag = gnl_read_buffer(buf_s[fd].buf, fd);
+	else
+		buf_s[fd].flag = 1;
+	if (buf_s[fd].flag == -1)
+	{
+		free(buf_s[fd].buf);
+		buf_s[fd].buf = NULL;
+		return (free(output), NULL);
+	}
+	output = gnl_helper(&buf_s[fd], output, fd);
 	return (output);
 }

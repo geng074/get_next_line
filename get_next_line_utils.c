@@ -6,7 +6,7 @@
 /*   By: giho <giho@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 14:45:54 by giho              #+#    #+#             */
-/*   Updated: 2025/05/29 15:57:18 by giho             ###   ########.fr       */
+/*   Updated: 2025/05/30 10:39:45 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,33 +81,33 @@ char	*gnl_strjoin(char *s1, char const *s2)
 	return (str - len);
 }
 
-void	gnl_adv(char *buffer, int adv)
+void	gnl_adv(char *buf, int adv)
 {
 	int	i;
 
 	i = 0;
-	while (i < BUFFER_SIZE - 1 + adv && buffer[i + adv + 1] != '\0')
+	while (i < BUFFER_SIZE - 1 + adv && buf[i + adv + 1] != '\0')
 	{
-		buffer[i] = buffer[i + adv + 1];
+		buf[i] = buf[i + adv + 1];
 		i++;
 	}
-	buffer[i] = '\0';
+	buf[i] = '\0';
 }
 
-ssize_t	gnl_read_buffer(char *buffer, int fd)
+ssize_t	gnl_read_buffer(char *buf, int fd)
 {
 	ssize_t	bytes_read;
 
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	bytes_read = read(fd, buf, BUFFER_SIZE);
 	if (bytes_read == -1)
 	{
 		return (-1);
 	}
 	if (bytes_read < BUFFER_SIZE)
 	{
-		buffer[bytes_read] = '\0';
+		buf[bytes_read] = '\0';
 		return (0);
 	}
-	buffer[bytes_read] = '\0';
+	buf[bytes_read] = '\0';
 	return (bytes_read);
 }
