@@ -3,113 +3,126 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: giho <giho@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/27 14:45:36 by giho              #+#    #+#             */
-/*   Updated: 2025/05/30 10:58:11 by giho             ###   ########.fr       */
+/*   Created: 2025/09/16 10:29:40 by giho              #+#    #+#             */
+/*   Updated: 2025/09/16 11:47:28 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*gnl_strchr(const char *s, int c)
+int ft_strlen(char *str)
 {
-	while (*s != '\0')
+	int i;
+	if (!str)
+		return 0;
+
+	i = 0;
+	while (str[i])
 	{
-		if (*s == (char)c)
-			return ((char *)s);
-		s++;
+		i++;
 	}
-	if ((char)c == '\0')
-		return ((char *)s);
-	return (NULL);
+	return (i);
+	
 }
 
-char	*gnl_empty_string(void)
+void ft_memcpy(char *src, char *dest, int len)
 {
-	char	*substr;
-
-	substr = (char *)malloc(1);
-	if (!substr)
-		return (NULL);
-	*substr = '\0';
-	return (substr);
-}
-
-char	*gnl_strdup(const char *s)
-{
-	char	*ptr;
-	size_t	len;
-	size_t	i;
-
-	len = gnl_strlen(s);
-	ptr = (char *)malloc(len + 1);
-	if (!ptr)
-		return (NULL);
+	int dest_start;
+	int i;
+	
+	if (!src || !dest)
+		return;
+	dest_start = ft_strlen(dest);
+	
 	i = 0;
 	while (i < len)
 	{
-		ptr[i] = s[i];
+		dest[dest_start + i] = src[i];
 		i++;
 	}
-	ptr[i] = '\0';
-	return (ptr);
+	dest[dest_start + i] = 0;	
+
 }
 
-static char	*gnl_helper(t_buffer_state *buf_s, char *output, int fd)
+char *get_next_line(int fd)
 {
-	char	*delimit;
+	static char *buffer;
+	char *output;
 	char	*temp;
+	int capacity = 3;
+	ssize_t read_bytes;
+	ssize_t read_total;
 
-	while (buf_s->flag >= 0)
-	{
-		if (buf_s->flag == 0 && buf_s->buf[0] == '\0')
-		{
-			free(buf_s->buf);
-			return (buf_s->buf = NULL, output);
-		}
-		delimit = gnl_strchr(buf_s->buf, '\n');
-		if (delimit)
-		{
-			temp = gnl_substr(buf_s->buf, 0, (size_t)(delimit - buf_s->buf));
-			gnl_adv(buf_s->buf, delimit - buf_s->buf);
-			output = gnl_strjoin(output, temp);
-			output = gnl_strjoin(output, "\n");
-			free(temp);
-			break ;
-		}
-		else
-			output = gnl_strjoin(output, buf_s->buf);
-		buf_s->flag = gnl_read_buffer(buf_s->buf, fd);
-	}
-	return (output);
-}
-
-char	*get_next_line(int fd)
-{
-	char					*output;
-	static t_buffer_state	buf_s;
-
-	if (fd == -1)
+	if (fd < 0)
 		return (NULL);
-	output = NULL;
-	if (!buf_s.buf)
+	read_total = 0;
+	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buffer)
 	{
-		buf_s.buf = malloc(BUFFER_SIZE + 1);
-		if (!buf_s.buf)
-			return (NULL);
-		buf_s.buf[0] = '\0';
+		fprintf(stderr, "malloc failed");
+		return NULL;
 	}
-	if (buf_s.buf[0] == '\0')
-		buf_s.flag = gnl_read_buffer(buf_s.buf, fd);
-	else
-		buf_s.flag = 1;
-	if (buf_s.flag == -1)
+	buffer[0] = 0;
+	
+	output = malloc((capacity + 1) * sizeof(char));
+	if (!output)
 	{
-		free(buf_s.buf);
-		buf_s.buf = NULL;
-		return (free(output), NULL);
+		fprintf(stderr, "malloc failed");
+		free(buffer);
+		return NULL;
 	}
-	output = gnl_helper(&buf_s, output, fd);
-	return (output);
+	output[0] = 0;
+	read_bytes = read(fd, buffer, BUFFER_SIZE);
+	while (read_bytes)
+	{
+		buffer[read_bytes] = 0;
+		// printf("buffer is %s\n", buffer);
+
+		if (read_total + read_bytes > capacity)
+		{
+			while (read_total + read_bytes > capacity)
+				capacity = capacity *2;
+			
+			temp = malloc((capacity + 1) * sizeof(char));
+			temp[0] = 0;
+			if (!output)
+			{
+				fprintf(stderr, "malloc failed");
+				free(buffer);
+				free(temp);
+				return NULL;
+			}
+			ft_memcpy(output, temp, read_total);
+			
+			temp[read_total] = 0;
+			free(output);
+			output = temp;
+			// printf("97 output is %s\n", output);
+
+		}
+		ft_memcpy(buffer, output, ft_strlen(buffer));
+		read_total = read_total + read_bytes;
+		output[read_total] = 0;
+		read_bytes = read(fd, buffer, BUFFER_SIZE);
+	}
+	free(buffer);
+	return output;
 }
+ int main()
+ {
+	int	fd;
+	char dest[10];
+	char *output;
+	// dest[0] = 'd';
+	// dest[1] = 0;
+	fd = open("input.txt", O_RDONLY);
+	output = get_next_line(fd);
+	printf("output is %s\n", output);
+	free(output);
+	// printf("str len is %d\n",ft_strlen("aaa "));
+	// ft_memcpy("aaa", dest, 3);
+	// printf("dest is %s\n", dest);
+
+ }

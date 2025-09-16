@@ -3,38 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: giho <giho@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/27 14:46:07 by giho              #+#    #+#             */
-/*   Updated: 2025/05/30 11:19:24 by giho             ###   ########.fr       */
+/*   Created: 2025/09/16 11:16:35 by giho              #+#    #+#             */
+/*   Updated: 2025/09/16 11:23:32 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-// # include <stdio.h>
-# include <unistd.h>
-//# include <fcntl.h>
-# include <stdlib.h>
+#define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 25
+#  define BUFFER_SIZE 4
 # endif
 
-typedef struct s_buffer_state
-{
-	int		fd;
-	char	*buf;
-	ssize_t	flag;		
-}	t_buffer_state;
-char	*get_next_line(int fd);
-ssize_t	gnl_read_buffer(char *buf, int fd);
-char	*gnl_strchr(const char *s, int c);
-char	*gnl_substr(char const *s, unsigned int start, size_t len);
-size_t	gnl_strlen(const char *str);
-char	*gnl_empty_string(void);
-char	*gnl_strjoin(char *s1, char const *s2);
-void	gnl_adv(char *buf, int adv);
-char	*gnl_strdup(const char *s);
 
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+
+char *get_next_line(int fd);
 #endif
