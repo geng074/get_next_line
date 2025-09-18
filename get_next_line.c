@@ -6,7 +6,7 @@
 /*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:29:40 by giho              #+#    #+#             */
-/*   Updated: 2025/09/18 12:43:15 by giho             ###   ########.fr       */
+/*   Updated: 2025/09/18 16:21:27 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,9 @@ char *get_next_line(int fd)
 	}
 	output[0] = 0;
 	
-	read_bytes = read(fd, buffer, BUFFER_SIZE);
+	read_bytes = ft_strlen(buffer); 
+	if (read_bytes == 0)
+		read_bytes = read(fd, buffer, BUFFER_SIZE);
 	if (read_bytes <= 0) 
 	{
 		free(buffer);
@@ -176,27 +178,27 @@ char *get_next_line(int fd)
 	buf.flag = 0;
 	return output;
 }
- int main()
- {
-	int	fd;
-	// char dest[10];
-	char *output;
+//  int main()
+//  {
+// 	int	fd;
+// 	// char dest[10];
+// 	char *output;
 
 
 	
-	// dest[0] = 'd';
-	// dest[1] = 0;
-	fd = open("input.txt", O_RDONLY);
-	output = get_next_line(fd);
-	printf("output is %s\n", output);
-	free(output);
+// 	// dest[0] = 'd';
+// 	// dest[1] = 0;
+// 	fd = open("input.txt", O_RDONLY);
+// 	output = get_next_line(fd);
+// 	printf("output is %s\n", output);
+// 	free(output);
 
-	output = get_next_line(fd);
-	printf("output is %s\n", output);
-	free(output);
+// 	output = get_next_line(fd);
+// 	printf("output is %s\n", output);
+// 	free(output);
 	
-	// printf("str len is %d\n",ft_strlen("aaa "));
-	// ft_memcpy("aaa", dest, 3);
-	// printf("dest is %s\n", dest);
+// 	// printf("str len is %d\n",ft_strlen("aaa "));
+// 	// ft_memcpy("aaa", dest, 3);
+// 	// printf("dest is %s\n", dest);
 
- }
+//  }
