@@ -6,7 +6,7 @@
 /*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 10:29:40 by giho              #+#    #+#             */
-/*   Updated: 2025/09/16 11:47:28 by giho             ###   ########.fr       */
+/*   Updated: 2025/09/18 12:43:15 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,36 +46,76 @@ void ft_memcpy(char *src, char *dest, int len)
 
 }
 
+char	*ft_getstrchr(char *str, char x)
+{
+	if (!str)
+		return NULL;
+
+	while (*str)
+	{
+		if (*str == x)	
+			return str;
+		str++;
+	}
+	return NULL;
+}
+
 char *get_next_line(int fd)
 {
+	static t_buf buf;
+	
 	static char *buffer;
 	char *output;
 	char	*temp;
+	char	*buffer_temp;
+	char	*buffer_original;
 	int capacity = 3;
 	ssize_t read_bytes;
 	ssize_t read_total;
 
+	
+
 	if (fd < 0)
 		return (NULL);
 	read_total = 0;
-	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (!buffer)
+
+	if (BUFFER_SIZE == 0)
+		return NULL;
+	if (buf.flag == 0)
+	{
+		buf.buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
+		buf.flag = 1;
+		buf.buffer[0] = 0;
+	}
+	if (!buf.buffer)
 	{
 		fprintf(stderr, "malloc failed");
+		buf.flag = 0;
 		return NULL;
 	}
-	buffer[0] = 0;
+	buffer = buf.buffer;
+	buffer_original = buffer;
 	
-	output = malloc((capacity + 1) * sizeof(char));
+	
+	output = malloc((capacity + 2) * sizeof(char));
 	if (!output)
 	{
 		fprintf(stderr, "malloc failed");
 		free(buffer);
+		buf.flag = 0;
 		return NULL;
 	}
 	output[0] = 0;
+	
 	read_bytes = read(fd, buffer, BUFFER_SIZE);
-	while (read_bytes)
+	if (read_bytes <= 0) 
+	{
+		free(buffer);
+		buf.flag = 0;
+		free(output);
+		return NULL;
+	}
+	while (read_bytes > 0)
 	{
 		buffer[read_bytes] = 0;
 		// printf("buffer is %s\n", buffer);
@@ -85,7 +125,7 @@ char *get_next_line(int fd)
 			while (read_total + read_bytes > capacity)
 				capacity = capacity *2;
 			
-			temp = malloc((capacity + 1) * sizeof(char));
+			temp = malloc((capacity + 2) * sizeof(char));
 			temp[0] = 0;
 			if (!output)
 			{
@@ -102,25 +142,59 @@ char *get_next_line(int fd)
 			// printf("97 output is %s\n", output);
 
 		}
-		ft_memcpy(buffer, output, ft_strlen(buffer));
-		read_total = read_total + read_bytes;
-		output[read_total] = 0;
-		read_bytes = read(fd, buffer, BUFFER_SIZE);
+
+		buffer_temp = ft_getstrchr(buffer,'\n');
+		if (!buffer_temp)
+		{
+			ft_memcpy(buffer, output, ft_strlen(buffer));
+			read_total = read_total + read_bytes;
+			output[read_total] = 0;
+			read_bytes = read(fd, buffer, BUFFER_SIZE);
+		}
+		else		
+		{
+			buffer[buffer_temp - buffer] = 0;
+			ft_memcpy(buffer, output, ft_strlen(buffer));
+			read_bytes = ft_strlen(buffer);
+			read_total = read_total + read_bytes;
+			output[read_total] = '\n';
+			output[read_total + 1] = 0;
+			read_total = read_total + 1;
+
+			buf.buffer[0] = 0;
+			ft_memcpy(buffer_temp + 1, buf.buffer, ft_strlen(buffer_temp + 1));
+			buffer = buf.buffer;
+			// buffer = buffer_temp + 1;
+			// read_bytes = ft_strlen(buffer_temp + 1) ;
+			read_bytes = ft_strlen(buffer) ;
+			return (output);
+			
+		}	
 	}
-	free(buffer);
+	
+	free(buffer_original);
+	buf.flag = 0;
 	return output;
 }
  int main()
  {
 	int	fd;
-	char dest[10];
+	// char dest[10];
 	char *output;
+
+
+	
 	// dest[0] = 'd';
 	// dest[1] = 0;
 	fd = open("input.txt", O_RDONLY);
 	output = get_next_line(fd);
 	printf("output is %s\n", output);
 	free(output);
+
+	output = get_next_line(fd);
+	printf("output is %s\n", output);
+	free(output);
+	
 	// printf("str len is %d\n",ft_strlen("aaa "));
 	// ft_memcpy("aaa", dest, 3);
 	// printf("dest is %s\n", dest);

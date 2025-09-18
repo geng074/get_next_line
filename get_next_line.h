@@ -6,7 +6,7 @@
 /*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/16 11:16:35 by giho              #+#    #+#             */
-/*   Updated: 2025/09/16 11:23:32 by giho             ###   ########.fr       */
+/*   Updated: 2025/09/18 12:01:54 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 4
+#  define BUFFER_SIZE 42
 # endif
 
 
@@ -22,6 +22,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+
+typedef struct s_buf
+{
+	char *buffer;
+	int flag;
+} t_buf;
 
 char *get_next_line(int fd);
 #endif
