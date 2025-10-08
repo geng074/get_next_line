@@ -3,24 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: giho <giho@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/08 10:36:10 by giho              #+#    #+#             */
-/*   Updated: 2025/10/08 12:06:36 by giho             ###   ########.fr       */
+/*   Created: 2025/10/01 12:00:04 by giho              #+#    #+#             */
+/*   Updated: 2025/10/01 15:37:06 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#define GET_NEXT_LINE_H
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 4
 #endif
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+typedef struct s_buf
+{
+	char *buffer;
+	int buf_flag;
+} t_buf;
 
 char *get_next_line(int fd);
 

@@ -3,247 +3,222 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: giho <giho@student.42singapore.sg>         +#+  +:+       +#+        */
+/*   By: giho <giho@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/01 11:59:45 by giho              #+#    #+#             */
-/*   Updated: 2025/10/01 16:56:07 by giho             ###   ########.fr       */
+/*   Created: 2025/10/08 10:36:01 by giho              #+#    #+#             */
+/*   Updated: 2025/10/08 12:23:31 by giho             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int ft_strlen(char *str)
-{
-	int len;
-	
-	if (!str)
-		return 0;
-	len = 0;
-	while (str[len])
-	{
-		len++;
-	}
-	return (len);
-	
-}
-
-void ft_memmove(char *src, char *dest)
+void ft_strcpy(char *src, char *dest)
 {
 	int i;
-	int len;
-	int dest_len;
-	if (!src)
-		return;
-	len = ft_strlen(src);
-	dest_len = ft_strlen(dest);
-	
-	i = 0;
-	while (i < len)
-	{
-		dest[dest_len + i] = src[i];
-		i++;
-	}
-	dest[dest_len + i] = 0;
-	
-	
-}
-
-void ft_memmove2(char *src, char *dest, int start)
-{
-	int i;
-	int src_len;
-	if (!src)
+	if (!src || !dest)
 		return;
 
-	src_len = ft_strlen(src);
 	i = 0;
-	while ((i + start) < src_len)
+	while (src[i])
 	{
-		dest[i] = src[start + i];
+		dest[i] = src[i];
 		i++;
 	}
 	dest[i] = 0;
 }
 
-int	has_return(char *str)
+int ft_strlen(char *str)
 {
 	int i;
+	if (!str)
+		return 0;
+
 	i = 0;
 	while (str[i])
-	{
-		if (str[i] == '\n')
-		{
-			i++;
-			return i;
-		}
 		i++;
+	return i;
+}
+
+void ft_strcat(char *buffer, char *output)
+{
+	int i;
+	int len;
+	if (!buffer || !output)
+		return;
+
+	i = 0;
+	len = ft_strlen(output);
+	
+	while (buffer[i])
+	{
+		output[len + i ] = buffer [i];
+		i++;	
+	}
+	output[len + i ]  = 0;
+	
+}
+
+int cr_position(char *str)
+{
+	int cr_pos;
+	
+	if (!str)
+		return -1;
+
+	cr_pos = 0;
+	while (str[cr_pos])
+	{
+		if (str[cr_pos] == '\n')
+			return cr_pos;
+		cr_pos++;
+			
 	}
 	return -1;
+
+	
 }
 char *get_next_line(int fd)
 {
-	static t_buf	buf;
-	// char	*buffer;
-	char	*output;
-	char	*buf_temp;
-	char	*temp;
-	// int		len;
-	int 	return_position;
-	ssize_t	read_bytes;
-	ssize_t 	read_total;
-	ssize_t	capacity;
-	capacity = 5;
+	static char *buffer;
+	char *buffer_temp;
+	int	buffer_cr;
+	char *output;
+	char *output_temp;
+	
+	ssize_t	read_total;
+	ssize_t read_bytes;
+	ssize_t capacity;
+	capacity = 4;
 	read_total = 0;
 
 	if (fd < 0)
-	{
 		return NULL;
-	}
-
-	if ((buf.buf_flag == 1) && buf.buffer)
+	if (!buffer)
 	{
-		// len = ft_strlen(buf.buffer);
-		// printf("107 buffer is %s, len is %d\n", buf.buffer, len);
-
-		
-		read_bytes = ft_strlen(buf.buffer);
-		if (read_bytes == 0)
-		read_bytes = read(fd, buf.buffer, BUFFER_SIZE);
-		if (read_bytes <= 0)
+		// printf("malloc buffer\n");
+		buffer = malloc(BUFFER_SIZE +1);
+		if (!buffer)
+			return NULL;
+		read_bytes = read(fd, buffer, BUFFER_SIZE);
+		if (read_bytes < 0)
 		{
-			free(buf.buffer);
+			free(buffer);
 			return NULL;
 		}
-		buf.buffer[read_bytes] = 0;
+		buffer[read_bytes] = 0;
+		// printf("97 buffer is %s\n", buffer);
+
 		
 	}
-	else
-	{
-		buf.buffer = malloc(BUFFER_SIZE + 1 );
-		// buf.buf_flag = 1;
-		if (!buf.buffer)
-			return NULL;
-	
-		read_bytes = read(fd, buf.buffer, BUFFER_SIZE);
-		if (read_bytes <= 0)
-		{
-			free(buf.buffer);
-			return NULL;
-		}
-		buf.buffer[read_bytes] = 0;
-	}
-
-	// if (read_bytes == 0)
-	// {
-	// 	free(buf.buffer);
-	// 	return NULL;
-	// }
-	
-	output = malloc(capacity + 1 );
+	output = malloc(capacity +1);
 	if (!output)
 	{
-		free(buf.buffer);
+		free(buffer);
 		return NULL;
 	}
-	output[0] = 0;
+	output[0]= 0;	
+	// ft_strcpy("ab", output);
+	// printf("output is %s\n", output);
+
+	
+	read_bytes = ft_strlen(buffer);
 	
 	while (read_bytes > 0)
 	{
-		// len = ft_strlen(buf.buffer);
-		// printf("82 buffer is %s, len is %d\n", buf.buffer, len);
-
-		if (read_total + read_bytes > capacity)
+		if (capacity < read_total + read_bytes)
 		{
-			while (read_total + read_bytes > capacity)
-			{
+			while (capacity < read_total + read_bytes)
 				capacity = capacity * 2;
-			}
-			temp = malloc(capacity + 1);
-			if (!temp)
+			output_temp = malloc(capacity + 1);
+			if (!output_temp)
 			{
-				free(buf.buffer);
+				free(buffer);
 				free(output);
 				return NULL;
 			}
-			temp[0] = 0;
-			ft_memmove(output, temp);
+			ft_strcpy(output, output_temp);
 			free(output);
-			output = temp;
-		}
+			output = output_temp;
+			// printf("86 output is %s\n", output);
 
-		return_position = has_return(buf.buffer);
-		if (return_position > 0)
-		{
-			buf.buf_flag = 1;
-			buf_temp = malloc(BUFFER_SIZE + 1);
-			if (!buf_temp)
-			{
-				free(buf.buffer);
-				free(output);
-				return NULL;
-			}
-			ft_memmove2(buf.buffer, buf_temp, return_position);
-			buf.buffer[return_position] = 0;
-			
-			ft_memmove(buf.buffer, output + read_total);
-			read_total = read_total + read_bytes;
-			output[read_total] = 0;
-			free(buf.buffer);
-			buf.buffer = buf_temp;
-			return (output);
 			
 		}
-
-		
-		// len = ft_strlen(buf.buffer);
-		// printf("192 buffer is %s, len is %d\n", buf.buffer, len);
-		// len = ft_strlen(output);
-		// printf("194 output is %s, len is %d\n", output, len);
-
-		
-		ft_memmove(buf.buffer, output + read_total);
 		read_total = read_total + read_bytes;
-		output[read_total] = 0;
-		
-		
-		// len = ft_strlen(output);
-		// printf("106 output is %s, len is %d\n", output, len);
+		// printf("buffer is %s\n", buffer);
 
 		
-		read_bytes = read(fd, buf.buffer, BUFFER_SIZE);
-		if (read_bytes < 0)
+		buffer_cr = cr_position(buffer);
+		if (buffer_cr >= 0)
 		{
-			free(buf.buffer);
-			free(output);
-			return NULL;
+			buffer_temp = buffer + buffer_cr + 1;
+			buffer[buffer_cr] = 0;
+			ft_strcat(buffer, output);
+			ft_strcat("\n", output);
+			// printf("133 output is %s\n", output);
+			buffer = buffer_temp;
+			// printf("155 buffer is %s\n", buffer);
+			return output;
+			// read_bytes = ft_strlen(buffer);
+			// if (read_bytes == 0)
+			// {
+			// 	read_bytes = read(fd, buffer, BUFFER_SIZE);
+			// 	if (read_bytes < 0)
+			// 	{
+			// 	free(buffer);
+			// 	free(output);
+			// 	return NULL;
+			// 	}
+			// 	buffer[read_bytes] = 0;
+			// }
+			
 		}
-		buf.buffer[read_bytes] = 0;
+		else
+		{		
+			ft_strcat(buffer, output);
+			buffer[0] = 0;
+			// printf("140 output is %s\n", output);
+
+
+			read_bytes = read(fd, buffer, BUFFER_SIZE);
+			if (read_bytes < 0)
+			{
+				free(buffer);
+				free(output);
+				return NULL;
+			}
+			buffer[read_bytes] = 0;
+		}
 	}
-	free(buf.buffer);
-	buf.buffer = NULL;
 	
+	
+	// if (buffer[0] == 0)
+	// 	free(buffer);
 	return output;
-	
-	
 }
 
-// int main ()
-// {
-// 	int fd;
-// 	int len;
-// 	char	*output;
+int main()
+{
+	int fd;
+	char *output;
+	fd = 0;
 
-// 	fd = open("input.txt", O_RDONLY);
-// 	fd = 1000;
+	// fd = open("files/empty", O_RDONLY);
+	fd = open("input.txt", O_RDONLY);
+	// fd = -1;
+	output = get_next_line(fd);
+	printf("output is %s", output);
 	
-// 	output = get_next_line(fd);
-// 	len = ft_strlen(output);
+	printf("\n with feeling \n");
+	output = get_next_line(fd);
+	printf("output is %s", output);
 
-// 	printf("output is %s, len is %d\n", output, len);
+	printf("\n with feeling \n");
+	output = get_next_line(fd);
+	printf("output is %s", output);
 
 	
-// 	output = get_next_line(fd);
-// 	len = ft_strlen(output);
-
-// 	printf("output is %s, len is %d\n", output, len);
-// }
+	// printf("str is %d\n", ft_strlen("test"));
+	// ft_strcpy("test", test);
+	// printf("str2 is %s\n", test);
+	close(fd);
+}
